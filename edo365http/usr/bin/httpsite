@@ -1,0 +1,105 @@
+#!/bin/sh
+# written by Benno Falkner
+
+help(){
+    cat <<EOF
+Help HTTPSITE - Create new http host folder for nginx
+usage: httpsite <mode> <args>
+modes:
+    new <name> <args>   create a new host with name 
+    -p|--private <cert>       use a private certificate or create a new one with name             
+    -n|--no-cert               use no certificate (http only)   
+    
+    help                print this help
+EOF
+}
+
+# error 
+die () { echo "ERROR: $1" ; exit 1; }
+
+# new site
+new() {
+    test -z "$1" && die "no name given";
+    echo "create new site: $1";
+    NAME=$1; shift;
+    LOCATION="/var/www/";
+    SITEPATH="${LOCATION}${NAME}";
+
+
+    while [ "$1" != "" ]; do
+    case "$1" in
+        -p|--private) CERT=="$2";shift;shift;;
+        -n|--no-vert) NOCERT=true; shift;;
+        -l|--location) LOCATION="$2";SITEPATH="${LOCATION}${NAME}"; shift;shift;;
+        *) shift;;  #file
+    esac
+    done
+
+    # prepare folder
+    test -d "$SITEPATH" && die "folder already exists";
+    sudo mkdir -p "$SITEPATH";
+    sudo chown -R "$USER:$USER" "$SITEPATH";
+    sudo chmod -R 755 "$SITEPATH";
+    indexpage "$NAME" "$SITEPATH" "$USER";
+
+    sudo addconf "$SITEPATH" "$NAME";
+    
+    sudo nginx -t
+    sudo systemctl restart nginx
+
+    sudo certbot --nginx -d $NAME
+
+
+}
+
+indexpage() {
+   cat <<EOF > $2/index.html
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>$1</title>
+  <meta name="description" content="New Index Page">
+  <meta name="author" content="$3">
+  <!-- <link rel="stylesheet" href="css/styles.css?v=1.0"> -->
+</head>
+<body>
+	<h1>$1</h1>
+	<p>A new page ... </p>
+</body>
+</html>
+EOF 
+}
+
+addconf () {
+    SP=$1; shift;
+    NAME=$2; shift;
+    cat <<EOF > /etc/nginx/sites-available/$NAME.conf
+server {
+	listen 80;
+	listen [::]:80;
+
+	root $SP;
+	index index.html index.htm;
+
+	server_name $@;
+	
+	location / {
+		try_files \$uri \$uri/ =404;
+	}
+}
+EOF
+    ln -s /etc/nginx/sites-available/$NAME /etc/nginx/sites-enabled/
+}
+
+# 
+MODE=$1; 
+
+# mode switch
+case "$MODE" in
+    new) shift; new $@; exit;;
+    rm) shift; rm $@; exit;;
+    help|-h |--help) help; exit;;
+    *) echo "\"deb help\" for help"; exit;;
+esac

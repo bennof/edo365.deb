@@ -1,0 +1,8 @@
+#!/bin/sh
+echo install npm
+npm install -g npm
+echo install Vue CLI
+npm install -g @vue/cli
+echo install SASS
+npm install -g sass
+echo install uglify-js

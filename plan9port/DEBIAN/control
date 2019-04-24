@@ -1,0 +1,10 @@
+Package: plan9port
+Version: 0.1.0
+Section: network
+Priority: optional
+Maintainer: Benjamin
+Homepage: http://http://deb.edo365.de/
+Architecture: all
+Depends: xorg-dev, fonts-lato, fonts-open-sans, gcc
+Description: <text>
+

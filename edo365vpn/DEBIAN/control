@@ -1,0 +1,9 @@
+Package: edo365vpn
+Version: 0.1.0
+Section: network
+Priority: optional
+Maintainer: Benjamin Benno Falkner <benno.falkner@gmail.com>
+Homepage: http://http://deb.edo365.de/
+Architecture: all
+Depends: strongswan, strongswan-pki, libcharon-extra-plugins, libcharon-standard-plugins
+Description: Install VPN Network

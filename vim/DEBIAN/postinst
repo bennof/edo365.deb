@@ -1,0 +1,87 @@
+#!/bin/sh
+
+#userspace install
+for u in $(ls -d /home/*/); do 
+mkdir -p ${u}.vim/autoload
+wget -O  ${u}.vim/autoload/plug.vim https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+NAME=$(basename $u)
+chown -R $NAME:$NAME ${u}.vim
+cat > ${u}.vimrc <<EOF
+"Bennos VimRC
+set autoread
+set number
+set ruler
+
+syntax enable
+set encoding=utf8
+
+set ffs=unix,dos,mac
+
+set wrap
+
+call plug#begin('~/.vim/plugged')
+Plug 'scrooloose/nerdtree'
+Plug 'vim-syntastic/syntastic'
+Plug 'mattn/emmet-vim', { 'for': 'html' }
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'powerline/powerline'
+Plug 'bling/vim-bufferline'
+Plug 'tpope/vim-fugitive'
+Plug 'kien/ctrlp.vim'
+Plug 'altercation/vim-colors-solarized'
+Plug 'jimenezrick/vimerl', {'for': 'erlang'}
+Plug 'elixir-lang/vim-elixir', {'for' : 'elixir'}
+Plug 'pangloss/vim-javascript', {'for': 'javascript'}
+Plug 'tpope/vim-fireplace', {'for':'clojure'}
+Plug 'lervag/vimtex'
+"Plug 'tpope/vim_eunuch'
+"Plug 'valloric/youcompleteme'
+call plug#end()
+
+set  t_Co=256
+let g:airline_theme='badwolf'
+let g:airline#extensions#tabline#enabled = 1
+let g:solarized_termcolors=256
+
+syntax enable
+set background=dark
+colorscheme solarized
+let g:airline_theme='deus'
+let g:airline#extensions#tabline#enabled = 1
+hi Normal ctermbg=NONE
+
+filetype plugin indent on
+" show existing tab with 4 spaces width
+set tabstop=4
+" " when indenting with '>', use 4 spaces width
+set shiftwidth=4
+" " On pressing tab, insert 4 spaces
+set expandtab
+
+"easy nerdtree
+map <C-o> :NERDTreeToggle<CR>
+map <C-t> :highlight Normal ctermfg=black ctermbg=white<CR>
+
+
+function! s:RunShell(cmdline)
+    echo a:cmdline
+    let expanded_cmdline = a:cmdline
+    for part in split(a:cmdline, ' ')
+        if part[0] =~ '\v[%#<]'
+            let expanded_part = fnameescape(expand(part))
+            let expanded_cmdline = substitute(expanded_cmdline, part, expanded_part, '')
+        endif
+    endfor
+    botright new a:cmdline
+    setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
+    execute '$read !'. expanded_cmdline
+    setlocal nomodifiable
+    1
+endfunction
+command! -complete=shellcmd -nargs=+ Shell call s:RunShell(<q-args>)
+command! -complete=file -nargs=* Git call s:RunShell('git '.<q-args>)
+command! -nargs=* Make call s:RunShell('make '.<q-args>)
+EOF
+chown -R $NAME:$NAME ${u}.vimrc
+done

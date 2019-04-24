@@ -1,0 +1,16 @@
+#!/bin/sh
+postconf -e 'home_mailbox= Maildir/'
+postconf -e 'virtual_alias_maps= hash:/etc/postfix/virtual'
+#vi /etc/postfix/virtual
+postmap /etc/postfix/virtual
+systemctl restart postfix
+
+echo 'export MAIL=~/Maildir' | tee -a /etc/bash.bashrc |  tee -a /etc/profile.d/mail.sh
+echo "use <source /etc/profile.d/mail.sh> to enable postfix "
+
+ufw allow ssh
+sudo ufw allow 500,4500/udp
+ufw allow Postfix
+ufw disable
+ufw enable
+ufw status

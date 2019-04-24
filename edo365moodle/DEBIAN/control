@@ -1,0 +1,10 @@
+Package: edo365moodle
+Version: 0.1.0
+Section: network
+Priority: optional
+Maintainer: Benjamin
+Homepage: http://http://deb.edo365.de/
+Architecture: all
+Depends: 
+Description: <text>
+

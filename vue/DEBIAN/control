@@ -1,0 +1,9 @@
+Package: vue
+Version: 0.1.0
+Section: development
+Priority: optional
+Maintainer: Benjamin Benno Falkner <benno.falkner@gmail.com>
+Homepage: http://http://deb.edo365.de/
+Architecture: all
+Depends: nodejs, npm
+Description: Vue CLI and Tools

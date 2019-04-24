@@ -1,0 +1,9 @@
+Package: erlang
+Version: 0.1.0
+Section: dev
+Priority: optional
+Maintainer: Benjamin Benno Falkner <benno.falkner@gmail.com>
+Homepage: http://http://deb.edo365.de/
+Architecture: all
+Depends: wget, gcc, build-essential
+Description: prepare erlang installation

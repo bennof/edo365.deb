@@ -1,0 +1,95 @@
+#!/bin/sh
+# written by Benno Falkner
+
+help(){
+    cat <<EOF
+Help DEB - Debian Package Tool
+usage: deb <mode> <args>
+modes:
+    new <name> <args>   create a new deb with name 
+    -u|--url  <string>         set url
+    -m|--maintainer <string>   set maintainer
+    -s|--section <string>      set section   
+    -v|--version <string>      set version (default: 0.0.1)
+    -a|--arch <string>         set architecture (default: all)
+    -d|--deps <string>         set dependencies (default: none)
+    -h|--headline <string>     set headline
+    --desc <string>            set description
+
+    build <name>        build debian package from folder with name
+
+    rep <path>          update local repository at path
+EOF
+}
+
+die () { echo "ERROR: $1" ; exit 1; }
+
+
+build () { 
+    NAME=$(basename $1);
+    test -z "$1" && die "no name given"; 
+    echo "build deb: $NAME";
+    dpkg-deb -b $1;
+}
+
+rep () { echo $@;
+
+}
+
+new () { 
+    test -z "$1" && die "no name given" 
+    echo "create new deb: $1"
+    NAME=$1; shift;
+    AUTHOR="<maintainer>";
+    URL="<url>";
+    SECTION="<section>";
+    VERSION="0.0.1";
+    ARCH="all";
+    DEPS="";
+    DESC="<text>";
+
+    while [ "$1" != "" ]; do
+    case "$1" in
+        -u|--url) URL="$2";shift;shift;;
+        -m|--maintainer) AUTHOR="$2"; shift;shift;;
+        -s|--section) SECTION="$2"; shift;shift;;
+        -v|--version) VERSION="$2"; shift;shift;;
+        -a|--arch) ARCH="$2"; shift;shift;;
+        -d|--deps) DEPS="$2"; shift;shift;;
+        --desc) DESC="$2"; shift;shift;;
+        *) shift;;  #file
+    esac
+    done
+
+    test -d "$NAME" && die "folder already exists"
+    mkdir -p $NAME/DEBIAN;
+    echo "#!/bin/sh" > $NAME/DEBIAN/postinst;
+    chmod 755 $NAME/DEBIAN/postinst;
+    cat > $NAME/DEBIAN/control <<EOF
+Package: $NAME
+Version: $VERSION
+Section: $SECTION
+Priority: optional
+Maintainer: $AUTHOR
+Homepage: http://$URL
+Architecture: $ARCH
+Depends: $DEPS
+Description: $DESC
+
+EOF
+echo "Please set correct values in $NAME/DEBIAN/control"
+}
+
+
+# 
+MODE=$1; 
+
+# mode switch
+case "$MODE" in
+    new) shift; new $@; exit;;
+    rep) shift; rep $@; exit;;
+    build) shift; build $@; exit;;
+    help|-h |--help) help; exit;;
+    *) echo "\"deb help\" for help"; exit;;
+esac
+

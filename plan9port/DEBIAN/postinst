@@ -1,0 +1,9 @@
+#!/bin/sh
+
+mkdir -p /opt
+git clone https://github.com/9fans/plan9port /opt/plan9port
+cd /opt/plan9port; ./INSTALL
+#for u in $(ls -d /home/*/); do 
+#NAME=$(basename $u)
+#chown -R $NAME:$NAME ${u}.emacs.d
+#done

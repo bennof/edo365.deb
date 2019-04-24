@@ -1,0 +1,13 @@
+#!/bin/sh
+
+CODENAME=$(lsb_release -cs);
+wget -O- https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc | sudo apt-key add -
+echo "deb https://packages.erlang-solutions.com/ubuntu $(CODENAME) contrib" | tee /etc/apt/sources.list.d/rabbitmq.list
+
+#sudo apt update
+#sudo apt -y install erlang
+
+#git clone https://github.com/erlang/rebar3 /tmp/rebar3
+#/tmp/rebar3; ./bootstrap
+#install -m 755 rebar3/rebar3 /usr/bin/rebar3
+#rm -rf /tmp/rebar3

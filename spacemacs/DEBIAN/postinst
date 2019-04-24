@@ -1,0 +1,7 @@
+#!/bin/sh
+#userspace install
+for u in $(ls -d /home/*/); do 
+git clone https://github.com/syl20bnr/spacemacs ${u}.emacs.d 
+NAME=$(basename $u)
+chown -R $NAME:$NAME ${u}.emacs.d
+done
