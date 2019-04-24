@@ -5,6 +5,8 @@ SRCS:=$(shell ls -d */)
 DEBS= $(SRCS:%/=%.deb)
 
 all: .build $(DEBS)
+	wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
+
 
 install: all
 	test -d "/usr/local/edo365deb/ubuntu" || mkdir -p /usr/local/edo365deb/ubuntu

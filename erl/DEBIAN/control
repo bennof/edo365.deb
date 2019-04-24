@@ -5,5 +5,5 @@ Priority: optional
 Maintainer: Benjamin Benno Falkner <benno.falkner@gmail.com>
 Homepage: http://http://deb.edo365.de/
 Architecture: all
-Depends: wget, gcc, build-essential
+Depends: wget, gcc, build-essential, erlang-solutions, erlang, elixir
 Description: prepare erlang installation

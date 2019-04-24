@@ -1,6 +1,8 @@
 #!/bin/sh
 # written by Benno Falkner
 
+set -ex
+
 help(){
     cat <<EOF
 Help HTTPSITE - Create new http host folder for nginx
@@ -10,6 +12,7 @@ modes:
     -p|--private <cert>       use a private certificate or create a new one with name             
     -n|--no-cert              use no certificate (http only)   
     -w|--www                  create www subdomain too
+    lenc <name> [www.name]    add lets encrypt to name
     help                print this help
 EOF
 }
@@ -48,9 +51,20 @@ new() {
     sudo nginx -t
     sudo systemctl restart nginx
 
+    if test -z "$NOCERT" ; then 
+        if test -z "$CERT"; then
+            sudo use_letencrypt $NAME $WWW
+        else 
+            die "missing functionality"
+        fi
+    fi 
+}
+
+use_letencrypt() {
+    NAME=$1;
+    WWW=$2;
     test -z "$WWW" && sudo certbot --nginx -d $NAME || sudo certbot --nginx -d $NAME -d $WWW
-    echo $(crontab -l ; echo '0 2 * * * /usr/bin/certbot renew --quiet') | crontab -
-    
+    test -z "$(sudo crontab -l | grep  /usr/bin/certbot )" && {echo $(crontab -l ; echo '0 2 * * * /usr/bin/certbot renew --quiet') | crontab - ; } || echo "cerbot has been added to cron"
 }
 
 indexpage() {
@@ -100,7 +114,7 @@ MODE=$1;
 # mode switch
 case "$MODE" in
     new) shift; new $@; exit;;
-    rm) shift; rm $@; exit;;
+    lenc) shift; use_letencrypt $@; exit;;
     help|-h |--help) help; exit;;
     *) echo "\"deb help\" for help"; exit;;
 esac
