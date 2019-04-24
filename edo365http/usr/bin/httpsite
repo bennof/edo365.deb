@@ -8,8 +8,8 @@ usage: httpsite <mode> <args>
 modes:
     new <name> <args>   create a new host with name 
     -p|--private <cert>       use a private certificate or create a new one with name             
-    -n|--no-cert               use no certificate (http only)   
-    
+    -n|--no-cert              use no certificate (http only)   
+    -w|--www                  create www subdomain too
     help                print this help
 EOF
 }
@@ -24,12 +24,13 @@ new() {
     NAME=$1; shift;
     LOCATION="/var/www/";
     SITEPATH="${LOCATION}${NAME}";
-
+    WWW="";
 
     while [ "$1" != "" ]; do
     case "$1" in
         -p|--private) CERT=="$2";shift;shift;;
         -n|--no-vert) NOCERT=true; shift;;
+        -w|--www) WWW="www.$NAME";shift;;
         -l|--location) LOCATION="$2";SITEPATH="${LOCATION}${NAME}"; shift;shift;;
         *) shift;;  #file
     esac
@@ -42,14 +43,14 @@ new() {
     sudo chmod -R 755 "$SITEPATH";
     indexpage "$NAME" "$SITEPATH" "$USER";
 
-    sudo addconf "$SITEPATH" "$NAME";
+    sudo addconf "$SITEPATH" "$NAME" "$WWW";
     
     sudo nginx -t
     sudo systemctl restart nginx
 
-    sudo certbot --nginx -d $NAME
-
-
+    test -z "$WWW" && sudo certbot --nginx -d $NAME || sudo certbot --nginx -d $NAME -d $WWW
+    echo $(crontab -l ; echo '0 2 * * * /usr/bin/certbot renew --quiet') | crontab -
+    
 }
 
 indexpage() {

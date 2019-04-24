@@ -1,4 +1,4 @@
-Package: erlang
+Package: erl
 Version: 0.1.0
 Section: dev
 Priority: optional
