@@ -7,7 +7,6 @@ cat "$TF" | sed -e 's/*server_names_hash_bucket_size*/server_names_hash_bucket_s
 rm -f "$TF"
 
 systemctl reload nginx
-systemctl status nginx
 
 # firewall settings
 ufw allow ssh
