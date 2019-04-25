@@ -4,7 +4,7 @@ ROOT_BIT=4096
 ROOT_DAYS=7300
 CERT_BIT=2048
 CERT_DAYS=375
-CPATH="$CPATH"
+CPATH="~/.ssl"
 
 help () {
     cat <<EOF
@@ -29,53 +29,56 @@ case "$1" in
     -b|--bits)  CERT_BIT="$2"; shift;shift;;
     -d|--days)  CERT_DAYS="$2"; shift;shift;;
     -p|--path)  CPATH="$2"; shift;shift;;
+    -R|--rpath)  RPATH="$2"; shift;shift;;
     *) shift;;  #unkown
 esac
 done
+
+test -z "$RPATH" && RPATH=$CPATH;
 
 set -e
 
 # ROOT CERTIFICATE
 test -z "$ROOT" && exit
 echo "Root Certificate: $ROOT"
-test -d "$CPATH/root" || { mkdir -p $CPATH/root; chmod 700 "$CPATH/root"; }
+test -d "$CPATH/root" || { mkdir -p $RPATH/$ROOT; chmod 700 "$RPATH/$ROOT"; }
 echo "  GenKey: $ROOT.key.pem"
-test -e $CPATH/root/$ROOT.key.pem || { \
-    openssl genrsa -aes256 -out $CPATH/root/$ROOT.key.pem $ROOT_BIT ; \
-    chmod 400 $CPATH/root/$ROOT.key.pem; }
+test -e $RPATH/$ROOT/$ROOT.key.pem || { \
+    openssl genrsa -aes256 -out $RPATH/root/$ROOT.key.pem $ROOT_BIT ; \
+    chmod 400 $RPATH/$ROOT/$ROOT.key.pem; }
 echo "  GenCert: $ROOT.cert.pem"
-test -e $CPATH/root/$ROOT.cert.pem || { \
+test -e $RPATH/$ROOT/$ROOT.cert.pem || { \
 	openssl req \
-      -key $CPATH/root/$ROOT.key.pem \
+      -key $RPATH/$ROOT/$ROOT.key.pem \
       -new -x509 -days $ROOT_DAYS -sha256 -extensions v3_ca \
-      -out $CPATH/root/$ROOT.cert.pem; \
-	chmod 444 $CPATH/root/$ROOT.cert.pem; \
-	openssl x509 -noout -text -in $CPATH/root/$ROOT.cert.pem; }
+      -out $RPATH/$ROOT/$ROOT.cert.pem; \
+	chmod 444 $RPATH/$ROOT/$ROOT.cert.pem; \
+	openssl x509 -noout -text -in $RPATH/$ROOT/$ROOT.cert.pem; }
 
 # CERTIFICATE
 test -z "$NAME" && exit
 echo "Certificate: $NAME"
-test -d $CPATH/cert || { mkdir -p $CPATH/cert; chmod 700 $CPATH/cert; }
+test -d $CPATH/$NAME || { mkdir -p $CPATH/$NAME; chmod 700 $CPATH/$NAME; }
 echo "  GenKey: $NAME.key.pem"
-test -e $CPATH/cert/$NAME.key.pem || { \
-    openssl genrsa -aes256 -out $CPATH/cert/$NAME.key.pem $CERT_BIT ; \
-    chmod 400 $CPATH/cert/$NAME.key.pem; }
+test -e $CPATH/$NAME/$NAME.key.pem || { \
+    openssl genrsa -aes256 -out $CPATH/$NAME/$NAME.key.pem $CERT_BIT ; \
+    chmod 400 $CPATH/$NAME/$NAME.key.pem; }
 echo "  CsrGen: $NAME.csr.pem"
-test -e $CPATH/cert/$NAME.csr.pem || { \
+test -e $CPATH/$NAME/$NAME.csr.pem || { \
 	openssl req -new -sha256 \
-      -key $CPATH/cert/$NAME.key.pem \
-      -out $CPATH/cert/$NAME.csr.pem; }
+      -key $CPATH/$NAME/$NAME.key.pem \
+      -out $CPATH/$NAME/$NAME.csr.pem; }
 echo "  CertSign: $NAME.cert.pem"
-test -e $CPATH/cert/$NAME.cert.pem || { \
+test -e $CPATH/$NAME/$NAME.cert.pem || { \
 	openssl x509 -req -days $CERT_DAYS -sha256\
-	  -CA $CPATH/root/$ROOT.cert.pem \
-	  -CAkey $CPATH/root/$ROOT.key.pem \
+	  -CA $RPATH/$ROOT/$ROOT.cert.pem \
+	  -CAkey $RPATH/$ROOT/$ROOT.key.pem \
 	  -CAcreateserial \
-      -in $CPATH/cert/$NAME.csr.pem \
-      -out $CPATH/cert/$NAME.cert.pem; \
-	chmod 444 $CPATH/cert/$NAME.cert.pem; \
-	cp  $CPATH/root/$ROOT.cert.pem $CPATH/cert/$NAME.ca-chain.cert.pem; \
+      -in $CPATH/$NAME/$NAME.csr.pem \
+      -out $CPATH/$NAME/$NAME.cert.pem; \
+	chmod 444 $CPATH/$NAME/$NAME.cert.pem; \
+	cp  $RPATH/root/$ROOT.cert.pem $CPATH/$NAME/$NAME.ca-chain.cert.pem; \
 	openssl x509 -noout -text \
-      -in $CPATH/cert/$NAME.cert.pem;
-	openssl verify -CAfile $CPATH/root/$ROOT.cert.pem \
-      $CPATH/cert/$NAME.cert.pem; }
+      -in $CPATH/$NAME/$NAME.cert.pem;
+	openssl verify -CAfile $RPATH/$ROOT/$ROOT.cert.pem \
+      $CPATH/$NAME/$NAME.cert.pem; }

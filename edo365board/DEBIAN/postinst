@@ -10,7 +10,6 @@ if test -e "/etc/edo365board.conf"; then
         do C_EXIST=true; 
     done < "/etc/edo365board.conf"
 else 
-    db_purge
     db_input critical deb/servername || true
     db_input critical deb/user || true
     db_go || true
@@ -21,6 +20,8 @@ else
 
     i=0;
     while test "$i" -lt "5"; do
+        db_reset deb/password
+        db_reset deb/confirm
         db_input critical deb/password || true
         db_input critical deb/confirm || true
         db_go || true
@@ -38,13 +39,14 @@ else
         db_reset deb/password
         db_reset deb/confirm
     done;
+    test "$i" -eq "5" && exit 1;
 fi
 
 ################################################################################
 # ssl certificate
 if test ! -e "/etc/ssl/$SERVERNAME/$SERVERNAME.cert.pem"; then
     sslcert --root root --cert $SERVERNAME --path /etc/ssl/$SERVERNAME
-done
+fi
 
 ################################################################################
 # samba
