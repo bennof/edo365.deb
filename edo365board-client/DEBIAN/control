@@ -1,0 +1,10 @@
+Package: edo365board-client
+Version: 0.0.1
+Section: web
+Priority: optional
+Maintainer: Benjamin Benno Falkner <benno.falkner@gmail.com>
+Homepage: http://deb.edo365.de
+Architecture: all
+Depends: edo365board
+Description: Presenter for edo365board
+

@@ -5,6 +5,6 @@ Priority: optional
 Maintainer: Benjamin
 Homepage: http://http://deb.edo365.de/
 Architecture: all
-Depends: xorg-dev, fonts-lato, fonts-open-sans, gcc, build-essential
+Depends: libx11-dev, libxext-dev, libxt-dev, fonts-lato, fonts-open-sans, gcc, build-essential
 Description: Installs plan9port
 

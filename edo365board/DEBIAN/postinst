@@ -1,0 +1,101 @@
+#!/bin/sh
+
+echo  "Configure edo365board ..."
+set -e
+
+if test -e "/etc/edo365board.conf"; then 
+    while read -r SERVERNAME USER; 
+        do C_EXIST=true; 
+    done < "/etc/edo365board.conf"
+else 
+    db_input critical deb/servername || true
+    db_input critical deb/user || true
+    db_go || true
+    db_get deb/servername
+    SERVERNAME="$RET"
+    db_get deb/user
+    USER="$RET"
+
+    while true; do
+        db_input critical deb/password || true
+        db_input critical deb/confirm || true
+        db_go || true
+        db_get deb/password
+        PASSWD="$RET"
+        db_get deb/confirm
+        PASSWD2="$RET"
+        if test "$PASSWD" = "$PASSWD2"; then
+            break;
+        fi
+        db_input critical deb/passerror || true
+        db_go || true
+    done;
+fi
+
+################################################################################
+# ssl certificate
+if test ! -e "/etc/ssl/$SERVERNAME/$SERVERNAME.cert.pem"; then
+    sslcert --root root --cert $SERVERNAME --path /etc/ssl/$SERVERNAME
+done
+
+################################################################################
+# samba
+systemctl stop smbd.service
+mv /etc/samba/smb.conf /etc/samba/smb.conf.orig || echo "no file backup"
+DEVICES=$(ls /sys/class/net)
+cat > /etc/samba/smb.conf <<EOF
+[global]
+        server string = $SERVERNAME
+        server role = standalone server
+        interfaces = $DEVICES
+        bind interfaces only = yes
+        disable netbios = yes
+        smb ports = 445
+        log file = /var/log/samba/smb.log
+        max log size = 10000
+
+[$USER]
+        path = /samba/$USER
+        browseable = no
+        read only = no
+        force create mode = 0660
+        force directory mode = 2770
+        valid users = $USER
+EOF
+
+id -u $USER || { \
+    mkdir -p /samba/$USER/{public,style}; \
+    chown :sambashare /samba/; \
+    useradd --home /samba/$USER  --shell /usr/sbin/nologin --user-group  --groups sambashare $USER ; \
+    echo $USER:$PASSWD | chpasswd; \
+    chown -R $USER:sambashare /samba/$USER; \
+    chmod -R 2755 /samba/$USER/
+    smbpasswd -a $USER;\
+    smbpasswd -e $USER;\
+}
+systemctl start smbd.service
+# update firewall
+ufw allow Samba
+ufw disable
+ufw enable
+
+################################################################################
+# nginx
+httpsite new $SERVERNAME --cert /etc/ssl/$SERVERNAME/$SERVERNAME --user $USER --add-ip
+# link folders to samba
+test -e /var/www/$SERVERNAME/public || ln -s /samba/$USER/public /var/www/$SERVERNAME/public
+test -e /var/www/$SERVERNAME/style  || ln -s /samba/$USER/style /var/www/$SERVERNAME/style
+# install basic files
+test -e /var/www/$SERVERNAME/index.html || cp -r /usr/local/edo365board/index.html /var/www/$SERVERNAME/
+test -e /var/www/$SERVERNAME/sv.js || cp -r /usr/local/edo365board/edo365board.js /var/www/$SERVERNAME/
+
+test -e /var/www/$SERVERNAME/style/style.css || cp -r /usr/local/edo365board/style.css /var/www/$SERVERNAME/style/
+test -e /var/www/$SERVERNAME/style/script.js || cp -r /usr/local/edo365board/script.js /var/www/$SERVERNAME/style/
+sudo chown -R $USER:$USER /var/www/$SERVERNAME
+chmod -R 755 /var/www
+systemctl restart nginx
+
+################################################################################
+# install service
+update-rc.d edo365board defaults
+echo "$SERVERNAME $USER"> "/etc/edo365board.conf"

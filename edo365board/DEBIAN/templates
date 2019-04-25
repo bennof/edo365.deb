@@ -1,0 +1,21 @@
+Template: deb/servername
+Type: string
+Default: edo365board
+Description: Give the server a name
+
+Template: deb/user
+Type: string
+Default: board_user
+Description: Enter user name
+
+Template: deb/password
+Type: password
+Description: Enter user password
+
+Template: deb/confirm
+Type: password
+Description: Reenter user password
+
+Template: deb/passerror
+Type: error
+Description: Password does not match

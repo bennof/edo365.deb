@@ -34,6 +34,8 @@ new() {
         -p|--private) CERT=="$2";shift;shift;;
         -n|--no-vert) NOCERT=true; shift;;
         -w|--www) WWW="www.$NAME";shift;;
+        -u|--user)USER="$2";shift;shift;;
+        -a|--add-ip)$IP="$(hostname -I)";shift;shift;;
         -l|--location) LOCATION="$2";SITEPATH="${LOCATION}${NAME}"; shift;shift;;
         *) shift;;  #file
     esac
@@ -42,21 +44,26 @@ new() {
     # prepare folder
     test -d "$SITEPATH" && die "folder already exists";
     sudo mkdir -p "$SITEPATH";
+    indexpage "$NAME" "$SITEPATH" "$USER";
     sudo chown -R "$USER:$USER" "$SITEPATH";
     sudo chmod -R 755 "$SITEPATH";
-    indexpage "$NAME" "$SITEPATH" "$USER";
-
-    sudo addconf "$SITEPATH" "$NAME" "$WWW";
     
-    sudo nginx -t
-    sudo systemctl restart nginx
 
     if test -z "$NOCERT" ; then 
         if test -z "$CERT"; then
+            sudo addconf "$SITEPATH" "$NAME" "$WWW" "$IP";
+            sudo nginx -t
+            sudo systemctl restart nginx
             sudo use_letencrypt $NAME $WWW
         else 
-            die "missing functionality"
+            sudo addconfcert "$SITEPATH" "$CERT" "$NAME" "$WWW" "$IP";
+            sudo nginx -t
+            sudo systemctl restart nginx
         fi
+    else 
+        sudo addconf "$SITEPATH" "$NAME" "$WWW" "$IP";
+        sudo nginx -t
+        sudo systemctl restart nginx
     fi 
 }
 
@@ -68,7 +75,7 @@ use_letencrypt() {
 }
 
 indexpage() {
-   cat <<EOF > $2/index.html
+   test -e "$2/index.html" || cat <<EOF > $2/index.html
 <!doctype html>
 
 <html lang="en">
@@ -89,7 +96,8 @@ EOF
 
 addconf () {
     SP=$1; shift;
-    NAME=$2; shift;
+    NAME=$1; shift;
+
     cat <<EOF > /etc/nginx/sites-available/$NAME.conf
 server {
 	listen 80;
@@ -107,6 +115,48 @@ server {
 EOF
     ln -s /etc/nginx/sites-available/$NAME /etc/nginx/sites-enabled/
 }
+
+
+addconfcert() {
+    SP=$1; shift;
+    
+    if test -e $1.key.pem; then 
+        KEY=$1.key.pem
+    else
+        die "key: $1.key.pem not found"
+    fi
+
+    if test -e $1.ca-chain.cert.pem; then 
+        CERT=$1.ca-chain.cert.pem
+    elif test -e $1.cert.pem; then
+        CERT=$1.cert.pem
+    else 
+        die "certificate: $1.cert.pem not found"
+    fi
+    shift;
+    NAME=$1; shift;
+
+    cat <<EOF > /etc/nginx/sites-available/$NAME.conf
+server {
+	listen 443 ssl;
+
+	root $SP;
+    ssl_certificate     $CERT;
+    ssl_certificate_key $KEY;
+    ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+
+	index index.html index.htm;
+
+	server_name $@;
+	
+	location / {
+		try_files \$uri \$uri/ =404;
+	}
+}
+EOF
+    ln -s /etc/nginx/sites-available/$NAME /etc/nginx/sites-enabled/
+}
+
 
 # 
 MODE=$1; 

@@ -1,0 +1,32 @@
+help () {
+    cat <<EOF
+Help edo365watchfolder:
+usage: edo365watchfolder <args>
+-h / --help            display this help
+-t / --target <name>   output file created with name: "name".
+-w / --watch <path>    folder to be watched.
+EOF
+}
+
+scan () { # target dir
+    cd $2
+    FILES=*.html;
+    echo -n "[\"" > $1
+    echo -n $FILES | sed -e 's/ /","/g' >> $1
+    echo -n "\"]" >> $1
+}
+
+while [ "$1" != "" ]; do
+case "$1" in 
+    -h|--help) help; exit ;;
+    -w| --watch) WATCH="$2"; shift;shift;;
+    -t| --target) TARGET="$2"; shift;shift;;
+    *) shift;;  #unkown
+esac
+done
+
+scan $TARGET $WATCH;
+inotifywait -m -e modify -e delete -e create $WATCH | 
+    while read path action file; do 
+        scan $TARGET $WATCH;
+    done;
