@@ -41,7 +41,7 @@ set -e
 # ROOT CERTIFICATE
 test -z "$ROOT" && exit
 echo "Root Certificate: $ROOT"
-test -d "$CPATH/root" || { mkdir -p $RPATH/$ROOT; chmod 700 "$RPATH/$ROOT"; }
+test -d "$RPATH/$ROOT" || { mkdir -p $RPATH/$ROOT; chmod 700 "$RPATH/$ROOT"; }
 echo "  GenKey: $ROOT.key.pem"
 test -e $RPATH/$ROOT/$ROOT.key.pem || { \
     openssl genrsa -aes256 -out $RPATH/root/$ROOT.key.pem $ROOT_BIT ; \

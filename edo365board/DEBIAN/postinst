@@ -1,44 +1,56 @@
 #!/bin/sh
 set -e
 echo  "Configure edo365board ..."
-. /usr/share/debconf/confmodule
+#. /usr/share/debconf/confmodule
 
-
+# read parameter
+pread() {
+    if test -z "$2" ; then echo "Enter $1: "; read RET;
+    elif test "$2" = "passwd" ; then echo "Enter $1: "; read -s RET;
+    else echo "Enter $1 (default: $2): "; read RET; test -z "$RET" && RET=$2;
+    fi
+}
+# error
+die () { echo "ERROR: $1" ; exitr 1; }
 
 if test -e "/etc/edo365board.conf"; then 
     while read -r SERVERNAME USER; 
         do C_EXIST=true; 
     done < "/etc/edo365board.conf"
 else 
-    db_input critical deb/servername || true
-    db_input critical deb/user || true
-    db_go || true
-    db_get deb/servername
+    #db_input critical deb/servername || true
+    #db_input critical deb/user || true
+    #db_go || true
+    #db_get deb/servername
+    pread "server name" "edo365board"
     SERVERNAME="$RET"
-    db_get deb/user
+    #db_get deb/user
+    pread "username" "board_user"
     USER="$RET"
 
     i=0;
     while test "$i" -lt "5"; do
-        db_reset deb/password
-        db_reset deb/confirm
-        db_input critical deb/password || true
-        db_go || true
-        db_get deb/password
+        #db_reset deb/password
+        #db_reset deb/confirm
+        #db_input critical deb/password || true
+        #db_go || true
+        #db_get deb/password
+        pread "password" passwd
         PASSWD="$RET"
-        db_input critical deb/confirm || true
-        db_go || true
-        db_get deb/confirm
+        #db_input critical deb/confirm || true
+        #db_go || true
+        #db_get deb/confirm
+        pread "confirm password" passwd
         PASSWD2="$RET"
         if test "$PASSWD" = "$PASSWD2"; then
             break;
         fi
-        db_input critical deb/passerror || true
-        db_go || true
-        echo "$i: $PASSWD not $PASSWD2";
+        #db_input critical deb/passerror || true
+        #db_go || true
+        echo "Does not match, retry ($i).";
         i=$(expr "$i" + "1");
-        db_reset deb/password
-        db_reset deb/confirm
+        #db_reset deb/password
+        #db_reset deb/confirm
     done;
     test "$i" -eq "5" && exit 1;
 fi
@@ -46,7 +58,7 @@ fi
 ################################################################################
 # ssl certificate
 if test ! -e "/etc/ssl/$SERVERNAME/$SERVERNAME.cert.pem"; then
-    sslcert --root root --cert $SERVERNAME --path /etc/ssl/$SERVERNAME
+    sslcert --root root --cert $SERVERNAME --path /etc/ssl
 fi
 
 ################################################################################
