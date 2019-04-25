@@ -1,9 +1,9 @@
 #!/bin/sh
-
+set -e
 echo  "Configure edo365board ..."
 . /usr/share/debconf/confmodule
 
-set -e
+
 
 if test -e "/etc/edo365board.conf"; then 
     while read -r SERVERNAME USER; 
