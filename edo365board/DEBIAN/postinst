@@ -6,7 +6,7 @@ echo  "Configure edo365board ..."
 # read parameter
 pread() {
     if test -z "$2" ; then echo "Enter $1: "; read RET;
-    elif test "$2" = "passwd" ; then echo "Enter $1: "; read -s RET;
+    elif test "$2" = "passwd" ; then echo "Enter $1: "; stty -echo; read RET; stty echo;
     else echo "Enter $1 (default: $2): "; read RET; test -z "$RET" && RET=$2;
     fi
 }
