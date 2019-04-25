@@ -23,10 +23,11 @@ else
         db_reset deb/password
         db_reset deb/confirm
         db_input critical deb/password || true
-        db_input critical deb/confirm || true
         db_go || true
         db_get deb/password
         PASSWD="$RET"
+        db_input critical deb/confirm || true
+        db_go || true
         db_get deb/confirm
         PASSWD2="$RET"
         if test "$PASSWD" = "$PASSWD2"; then
