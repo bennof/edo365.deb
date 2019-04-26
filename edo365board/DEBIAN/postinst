@@ -115,7 +115,7 @@ test -e /var/www/$SERVERNAME/edo365board.js || cp -r /usr/local/edo365board/edo3
 
 test -e /var/www/$SERVERNAME/style/style.css || cp -r /usr/local/edo365board/style.css /var/www/$SERVERNAME/style/
 test -e /var/www/$SERVERNAME/style/script.js || cp -r /usr/local/edo365board/script.js /var/www/$SERVERNAME/style/
-sudo chown -R $USER:$USER /var/www/$SERVERNAME
+chown -R $USER:$USER /var/www/$SERVERNAME
 chmod -R 755 /var/www
 systemctl restart nginx
 
