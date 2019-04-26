@@ -106,8 +106,8 @@ ufw enable
 # nginx
 httpsite new $SERVERNAME --private /etc/ssl/$SERVERNAME/$SERVERNAME --user $USER --add-ip
 # link folders to samba
-test -e /var/www/$SERVERNAME/public || ln -s /samba/$USER/public /var/www/$SERVERNAME/public
-test -e /var/www/$SERVERNAME/style  || ln -s /samba/$USER/style /var/www/$SERVERNAME/style
+test -L /var/www/$SERVERNAME/public || ln -s /samba/$USER/public /var/www/$SERVERNAME/public
+test -L /var/www/$SERVERNAME/style  || ln -s /samba/$USER/style /var/www/$SERVERNAME/style
 # install basic files
 test -e /var/www/$SERVERNAME/index.html || cp -r /usr/local/edo365board/index.html /var/www/$SERVERNAME/
 test -e /var/www/$SERVERNAME/edo365board.js || cp -r /usr/local/edo365board/edo365board.js /var/www/$SERVERNAME/
