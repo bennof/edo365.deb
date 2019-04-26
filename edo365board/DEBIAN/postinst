@@ -110,7 +110,7 @@ test -e /var/www/$SERVERNAME/public || ln -s /samba/$USER/public /var/www/$SERVE
 test -e /var/www/$SERVERNAME/style  || ln -s /samba/$USER/style /var/www/$SERVERNAME/style
 # install basic files
 test -e /var/www/$SERVERNAME/index.html || cp -r /usr/local/edo365board/index.html /var/www/$SERVERNAME/
-test -e /var/www/$SERVERNAME/sv.js || cp -r /usr/local/edo365board/edo365board.js /var/www/$SERVERNAME/
+test -e /var/www/$SERVERNAME/edo365board.js || cp -r /usr/local/edo365board/edo365board.js /var/www/$SERVERNAME/
 
 test -e /var/www/$SERVERNAME/style/style.css || cp -r /usr/local/edo365board/style.css /var/www/$SERVERNAME/style/
 test -e /var/www/$SERVERNAME/style/script.js || cp -r /usr/local/edo365board/script.js /var/www/$SERVERNAME/style/
