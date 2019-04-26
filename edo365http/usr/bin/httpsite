@@ -102,7 +102,7 @@ indexpage() {
 EOF 
 }
 
-addconf () {
+addconf() {
     SP=$1; shift;
     NAME=$1; shift;
 
