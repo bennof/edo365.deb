@@ -121,7 +121,7 @@ server {
 	}
 }
 EOF
-    ln -s /etc/nginx/sites-available/$NAME /etc/nginx/sites-enabled/;
+    test -e /etc/nginx/sites-enabled/$NAME || ln -s /etc/nginx/sites-available/$NAME /etc/nginx/sites-enabled/;
 }
 
 
@@ -162,7 +162,7 @@ server {
 	}
 }
 EOF
-    ln -s /etc/nginx/sites-available/$NAME /etc/nginx/sites-enabled/;
+    test -e /etc/nginx/sites-enabled/$NAME || ln -s /etc/nginx/sites-available/$NAME /etc/nginx/sites-enabled/;
 }
 
 
