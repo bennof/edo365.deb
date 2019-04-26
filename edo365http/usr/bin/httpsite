@@ -31,7 +31,7 @@ new() {
 
     while [ "$1" != "" ]; do
     case "$1" in
-        -p|--private) CERT=="$2";shift;shift;;
+        -p|--private) CERT="$2";shift;shift;;
         -n|--no-cert) NOCERT=true; shift;;
         -w|--www) WWW="www.$NAME";shift;;
         -u|--user)USER="$2";shift;shift;;
