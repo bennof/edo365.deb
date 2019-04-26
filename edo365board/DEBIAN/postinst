@@ -11,7 +11,7 @@ pread() {
     fi
 }
 # error
-die () { echo "ERROR: $1" ; exitr 1; }
+die() { echo "ERROR: $1" ; exitr 1; }
 
 if test -e "/etc/edo365board.conf"; then 
     while read -r SERVERNAME USER; 

@@ -42,13 +42,13 @@ new() {
     done
 
     # prepare folder
-    test -d "$SITEPATH" && die "folder already exists";
-    mkdir -p "$SITEPATH";
-    indexpage "$NAME" "$SITEPATH" "$USER";
-    chown -R "$USER:$USER" "$SITEPATH";
-    chmod -R 755 "$SITEPATH";
+    if test ! -d "$SITEPATH"; then  
+        mkdir -p "$SITEPATH";
+        indexpage "$NAME" "$SITEPATH" "$USER";
+        chown -R "$USER:$USER" "$SITEPATH";
+        chmod -R 755 "$SITEPATH";
+    fi;
     
-
     if test -z "$NOCERT" ; then 
         if test -z "$CERT"; then
             addconf "$SITEPATH" "$NAME" "$WWW" "$IP";
