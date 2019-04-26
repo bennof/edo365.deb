@@ -104,7 +104,7 @@ ufw enable
 
 ################################################################################
 # nginx
-httpsite new $SERVERNAME --cert /etc/ssl/$SERVERNAME/$SERVERNAME --user $USER --add-ip
+httpsite new $SERVERNAME --private /etc/ssl/$SERVERNAME/$SERVERNAME --user $USER --add-ip
 # link folders to samba
 test -e /var/www/$SERVERNAME/public || ln -s /samba/$USER/public /var/www/$SERVERNAME/public
 test -e /var/www/$SERVERNAME/style  || ln -s /samba/$USER/style /var/www/$SERVERNAME/style
