@@ -35,7 +35,7 @@ new() {
         -n|--no-vert) NOCERT=true; shift;;
         -w|--www) WWW="www.$NAME";shift;;
         -u|--user)USER="$2";shift;shift;;
-        -a|--add-ip)IP="$(hostname -I)";shift;shift;;
+        -a|--add-ip)IP="$(hostname -I)";shift;;
         -l|--location) LOCATION="$2";SITEPATH="${LOCATION}${NAME}"; shift;shift;;
         *) shift;;  #file
     esac
