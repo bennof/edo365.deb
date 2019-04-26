@@ -70,8 +70,16 @@ new() {
 use_letencrypt() {
     NAME=$1;
     WWW=$2;
-    test -z "$WWW" && sudo certbot --nginx -d $NAME || sudo certbot --nginx -d $NAME -d $WWW
-    test -z "$(sudo crontab -l | grep  /usr/bin/certbot )" && {echo $(crontab -l ; echo '0 2 * * * /usr/bin/certbot renew --quiet') | crontab - ; } || echo "cerbot has been added to cron"
+    if test -z "$WWW"; then 
+        sudo certbot --nginx -d $NAME
+    else 
+        sudo certbot --nginx -d $NAME -d $WWW;
+    fi
+    if test -z "$(sudo crontab -l | grep  /usr/bin/certbot )"; then 
+        echo $(crontab -l ; echo '0 2 * * * /usr/bin/certbot renew --quiet') | crontab - ;  
+    else
+        echo "cerbot has been added to cron";
+    fi
 }
 
 indexpage() {
