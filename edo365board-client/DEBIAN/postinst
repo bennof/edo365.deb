@@ -49,8 +49,10 @@ echo "chromium --kiosk $SERVERNAME" >> $UHOME/.xinitrc
 echo "if test -z \"\$DISPLAY\" && test \"\$(tty)\" = \"/dev/tty1\"; then" >> $UHOME/.profile
 echo "exec xinit" >> $UHOME/.profile
 echo "fi" >> $UHOME/.profile
-chown -R $USER:$USER $UHOME; 
-chmod -R 644 $UHOME/*
+chown -R $USER:$USER $UHOME/.profile; 
+chmod 644 $UHOME/.profile;
+chown -R $USER:$USER $UHOME/.xinitrc; 
+chmod 644 $UHOME/.xinitrc;
 
 # Enable autologin
 cat /etc/systemd/system/getty.target.wants/getty@tty1.service | sed -e "s!*ExecStart=*!ExecStart=-/sbin/agetty -a $USER %I \$TERM!g" > /etc/systemd/system/getty.target.wants/getty@tty1_autologin.service;
