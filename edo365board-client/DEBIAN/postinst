@@ -40,10 +40,10 @@ fi
 # Create User
 UHOME=/home/$USER
 mkdir -p $UHOME
-if id -u $USER; then
-    useradd --home $UHOME $USER  || true;
-    echo $USER:$PASSWD | chpasswd;
-fi
+
+useradd --home $UHOME $USER  || true;
+echo $USER:$PASSWD | chpasswd;
+
 chown $USER:$USER $UHOME;
 chmod 755 $UHOME
 echo "#!/bin/sh" > $UHOME/.xinitrc
