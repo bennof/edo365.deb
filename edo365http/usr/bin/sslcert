@@ -61,7 +61,7 @@ echo "Certificate: $NAME"
 test -d $CPATH/$NAME || { mkdir -p $CPATH/$NAME; chmod 700 $CPATH/$NAME; }
 echo "  GenKey: $NAME.key.pem"
 test -e $CPATH/$NAME/$NAME.key.pem || { \
-    openssl genrsa -aes256 -out $CPATH/$NAME/$NAME.key.pem $CERT_BIT ; \
+    openssl genrsa -out $CPATH/$NAME/$NAME.key.pem $CERT_BIT ; \
     chmod 400 $CPATH/$NAME/$NAME.key.pem; }
 echo "  CsrGen: $NAME.csr.pem"
 test -e $CPATH/$NAME/$NAME.csr.pem || { \
