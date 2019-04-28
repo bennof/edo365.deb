@@ -12,11 +12,11 @@ pread() {
 # error
 die() { echo "ERROR: $1" ; exitr 1; }
 
-if test -e "/etc/edo365board_client.conf"; then 
-    while read -r SERVERNAME USER; 
-        do C_EXIST=true; 
+if test -e "/etc/edo365board_client.conf"; then
+    while read -r SERVERNAME USER;
+        do C_EXIST=true;
     done < "/etc/edo365board.conf"
-else 
+else
     pread "enter server address" "http://localhost:80/"
     SERVERNAME="$RET"
     pread "username" "board_client_user"
@@ -43,24 +43,28 @@ mkdir -p $UHOME
 if id -u $USER; then
     useradd --home $UHOME $USER  || true;
     echo $USER:$PASSWD | chpasswd;
-fi 
-chown $USER:$USER $UHOME; 
+fi
+chown $USER:$USER $UHOME;
 chmod 755 $UHOME
 echo "#!/bin/sh" > $UHOME/.xinitrc
 echo "chromium --kiosk $SERVERNAME" >> $UHOME/.xinitrc
 echo "if test -z \"\$DISPLAY\" && test \"\$(tty)\" = \"/dev/tty1\"; then" >> $UHOME/.profile
 echo "exec xinit" >> $UHOME/.profile
 echo "fi" >> $UHOME/.profile
-chown -R $USER:$USER $UHOME/.profile; 
+chown -R $USER:$USER $UHOME/.profile;
 chmod 644 $UHOME/.profile;
-chown -R $USER:$USER $UHOME/.xinitrc; 
+chown -R $USER:$USER $UHOME/.xinitrc;
 chmod 644 $UHOME/.xinitrc;
 
 # Enable autologin
-cat /etc/systemd/system/getty.target.wants/getty@tty1.service | sed -e "s!*ExecStart=*!ExecStart=-/sbin/agetty -a $USER %I \$TERM!g" > /etc/systemd/system/getty.target.wants/getty@tty1_autologin.service;
-cat /etc/systemd/system/getty.target.wants/getty@tty1.service > /etc/systemd/system/getty.target.wants/getty@tty1.service.old
-rm -f /etc/systemd/system/getty.target.wants/getty@tty1.service 
-ln -s /etc/systemd/system/getty.target.wants/getty@tty1_autologin.service /etc/systemd/system/getty.target.wants/getty@tty1.service
+#cat /etc/systemd/system/getty.target.wants/getty@tty1.service | sed -e "s!*ExecStart=*!ExecStart=-/sbin/agetty -a $USER %I \$TERM!g" > /etc/systemd/system/getty.target.wants/getty@tty1_autologin.service;
+#cat /etc/systemd/system/getty.target.wants/getty@tty1.service > /etc/systemd/system/getty.target.wants/getty@tty1.service.old
+#rm -f /etc/systemd/system/getty.target.wants/getty@tty1.service
+#ln -s /etc/systemd/system/getty.target.wants/getty@tty1_autologin.service /etc/systemd/system/getty.target.wants/getty@tty1.service
+echo "[Service]"> /etc/systemd/system/getty@tty1.service.d/override.conf
+echo "ExecStart=">> /etc/systemd/system/getty@tty1.service.d/override.conf
+echo "ExecStart=-/usr/bin/agetty --autologin $USER --noclear %I $TERM">> /etc/systemd/system/getty@tty1.service.d/override.conf
+
 
 # Save config
 echo "$SERVERNAME $USER"> "/etc/edo365board_client.conf"

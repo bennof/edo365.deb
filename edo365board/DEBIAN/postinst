@@ -13,11 +13,11 @@ pread() {
 # error
 die() { echo "ERROR: $1" ; exitr 1; }
 
-if test -e "/etc/edo365board.conf"; then 
-    while read -r SERVERNAME USER; 
-        do C_EXIST=true; 
+if test -e "/etc/edo365board.conf"; then
+    while read -r SERVERNAME USER;
+        do C_EXIST=true;
     done < "/etc/edo365board.conf"
-else 
+else
     #db_input critical deb/servername || true
     #db_input critical deb/user || true
     #db_go || true
@@ -87,12 +87,12 @@ cat > /etc/samba/smb.conf <<EOF
 EOF
 
 
-mkdir -p /samba/$USER/public 
+mkdir -p /samba/$USER/public
 mkdir -p /samba/$USER/style
-chown :sambashare /samba/; 
-useradd --home /samba/$USER  --shell /usr/sbin/nologin --user-group  --groups sambashare $USER  || true; 
-echo $USER:$PASSWD | chpasswd; 
-chown -R $USER:sambashare /samba/$USER; 
+chown :sambashare /samba/;
+useradd --home /samba/$USER  --shell /usr/sbin/nologin --user-group  --groups sambashare $USER  || true;
+echo $USER:$PASSWD | chpasswd;
+chown -R $USER:sambashare /samba/$USER;
 chmod -R 2755 /samba/$USER/
 smbpasswd -a $USER;
 smbpasswd -e $USER;
@@ -123,3 +123,4 @@ systemctl restart nginx
 # install service
 update-rc.d edo365board defaults
 echo "$SERVERNAME $USER"> "/etc/edo365board.conf"
+/etc/init.d/edo365board start
