@@ -42,8 +42,8 @@ UHOME=/home/$USER
 mkdir -p $UHOME
 useradd --home $UHOME $USER  || true;
 echo $USER:$PASSWD | chpasswd; 
-chown -R $USER:$USER $UHOME; 
-chmod -R 755 $UHOME
+chown $USER:$USER $UHOME; 
+chmod 755 $UHOME
 echo "#!/bin/sh" > $UHOME/.xinitrc
 echo "chromium --kiosk $SERVERNAME" >> $UHOME/.xinitrc
 echo "if test -z \"\$DISPLAY\" && test \"\$(tty)\" = \"/dev/tty1\"; then" >> $UHOME/.profile
