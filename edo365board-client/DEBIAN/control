@@ -5,6 +5,6 @@ Priority: optional
 Maintainer: Benjamin Benno Falkner <benno.falkner@gmail.com>
 Homepage: http://deb.edo365.de
 Architecture: all
-Depends: edo365board
+Depends: xinit, chromium
 Description: Presenter for edo365board
 

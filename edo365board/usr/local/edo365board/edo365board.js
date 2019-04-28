@@ -23,6 +23,7 @@
 // Module definition
 var edo365board = (function (){
     // private
+    var RTag = null;
     var Pages = { pos: 0, html: [] };
     var Sleep = 5000;
     var USleep = 30000;
@@ -39,6 +40,25 @@ var edo365board = (function (){
           xhttp.open("GET","/listing.json", true);
           xhttp.send();
       },USleep);
+    };
+
+    function reload() {
+      window.setInterval(function(){
+        var xhttp;
+        xhttp=new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            var Tag = getResponseHeader("Etag");
+            if (RTag == null) {
+              RTag = Tag;
+            } else if (RTag != Tag) {
+              window.location.reload();
+            }
+          }
+        };
+        xhttp.open("HEAD","/style/script.js", true);
+        xhttp.send();
+      },10000);
     };
   
     function play() {
@@ -74,6 +94,7 @@ var edo365board = (function (){
       document.querySelector("#headline").innerHTML = "<img src=\"/style/"+src+"\">"
     } 
   
+
   
     return { // public
       pages: Pages,
@@ -83,6 +104,7 @@ var edo365board = (function (){
         if (Config.logo) set_logo(Config.logo);
         play();
         update();
+        reload();
       }
     }
 })();
