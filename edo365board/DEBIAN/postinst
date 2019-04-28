@@ -28,37 +28,39 @@ else
     pread "username" "board_user"
     USER="$RET"
 
-    i=0;
-    while test "$i" -lt "5"; do
+    #i=0;
+    #while test "$i" -lt "5"; do
         #db_reset deb/password
         #db_reset deb/confirm
         #db_input critical deb/password || true
         #db_go || true
         #db_get deb/password
-        pread "password" passwd
-        PASSWD="$RET"
+        #pread "password" passwd
+        #PASSWD="$RET"
         #db_input critical deb/confirm || true
         #db_go || true
         #db_get deb/confirm
-        pread "confirm password" passwd
-        PASSWD2="$RET"
-        if test "$PASSWD" = "$PASSWD2"; then
-            break;
-        fi
+        #pread "confirm password" passwd
+        #PASSWD2="$RET"
+        #if test "$PASSWD" = "$PASSWD2"; then
+        #    break;
+        #fi
         #db_input critical deb/passerror || true
         #db_go || true
-        echo "Does not match, retry ($i).";
-        i=$(expr "$i" + "1");
+        #echo "Does not match, retry ($i).";
+        #i=$(expr "$i" + "1");
         #db_reset deb/password
         #db_reset deb/confirm
-    done;
-    test "$i" -eq "5" && exit 1;
+    #done;
+    #test "$i" -eq "5" && exit 1;
 fi
 
 ################################################################################
 # ssl certificate
 if test ! -e "/etc/ssl/$SERVERNAME/$SERVERNAME.cert.pem"; then
     sslcert --root root --cert $SERVERNAME --path /etc/ssl
+    openssl x509 -in "/etc/ssl/$SERVERNAME/$SERVERNAME.cert.pem"-inform PEM -out "/usr/share/ca-certificates/$SERVERNAME.crt"
+    update-ca-certificates
 fi
 
 ################################################################################

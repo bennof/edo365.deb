@@ -1,5 +1,5 @@
 #!/bin/sh
-set -ex
+set -e
 echo  "Configure edo365board client ..."
 
 # read parameter
@@ -61,10 +61,10 @@ chmod 644 $UHOME/.xinitrc;
 #cat /etc/systemd/system/getty.target.wants/getty@tty1.service > /etc/systemd/system/getty.target.wants/getty@tty1.service.old
 #rm -f /etc/systemd/system/getty.target.wants/getty@tty1.service
 #ln -s /etc/systemd/system/getty.target.wants/getty@tty1_autologin.service /etc/systemd/system/getty.target.wants/getty@tty1.service
-#mkdir -p /etc/systemd/system/getty@tty1.service.d/
-#echo "[Service]"> /etc/systemd/system/getty@tty1.service.d/override.conf
-#echo "ExecStart=">> /etc/systemd/system/getty@tty1.service.d/override.conf
-#echo "ExecStart=-/sbin/agetty --autologin $USER --noclear %I 38400 linux">> /etc/systemd/system/getty@tty1.service.d/override.conf
+mkdir -p /etc/systemd/system/getty@tty1.service.d/
+echo "[Service]"> /etc/systemd/system/getty@tty1.service.d/override.conf
+echo "ExecStart=">> /etc/systemd/system/getty@tty1.service.d/override.conf
+echo "ExecStart=-/sbin/agetty --autologin $USER --noclear %I 38400 linux">> /etc/systemd/system/getty@tty1.service.d/override.conf
 systemctl enable getty@tty1.service
 
 # Save config

@@ -120,7 +120,7 @@ server {
 		try_files \$uri \$uri/ =404;
 	}
 }
-EOF 
+EOF
 
     test -L /etc/nginx/sites-enabled/$NAME || ln -s /etc/nginx/sites-available/$NAME /etc/nginx/sites-enabled/;
 }
