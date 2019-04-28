@@ -8,16 +8,16 @@ help(){
 Help HTTPSITE - Create new http host folder for nginx
 usage: httpsite <mode> <args>
 modes:
-    new <name> <args>   create a new host with name 
-    -p|--private <cert>       use a private certificate or create a new one with name             
-    -n|--no-cert              use no certificate (http only)   
+    new <name> <args>   create a new host with name
+    -p|--private <cert>       use a private certificate or create a new one with name
+    -n|--no-cert              use no certificate (http only)
     -w|--www                  create www subdomain too
     lenc <name> [www.name]    add lets encrypt to name
     help                print this help
 EOF
 }
 
-# error 
+# error
 die () { echo "ERROR: $1" ; exit 1; }
 
 # new site
@@ -42,41 +42,41 @@ new() {
     done
 
     # prepare folder
-    if test ! -d "$SITEPATH"; then  
+    if test ! -d "$SITEPATH"; then
         mkdir -p "$SITEPATH";
         indexpage "$NAME" "$SITEPATH" "$USER";
         chown -R "$USER:$USER" "$SITEPATH";
         chmod -R 755 "$SITEPATH";
     fi;
-    
-    if test -z "$NOCERT" ; then 
+
+    if test -z "$NOCERT" ; then
         if test -z "$CERT"; then
             addconf "$SITEPATH" "$NAME" "$WWW" "$IP";
             nginx -t
             systemctl restart nginx
             use_letencrypt $NAME $WWW
-        else 
+        else
             addconfcert "$SITEPATH" "$CERT" "$NAME" "$WWW" "$IP";
             nginx -t
             systemctl restart nginx
         fi
-    else 
+    else
         addconf "$SITEPATH" "$NAME" "$WWW" "$IP";
         nginx -t
         systemctl restart nginx
-    fi 
+    fi
 }
 
 use_letencrypt() {
     NAME=$1;
     WWW=$2;
-    if test -z "$WWW"; then 
+    if test -z "$WWW"; then
         certbot --nginx -d $NAME
-    else 
+    else
         certbot --nginx -d $NAME -d $WWW;
     fi
-    if test -z "$(crontab -l | grep  /usr/bin/certbot )"; then 
-        echo $(crontab -l ; echo '0 2 * * * /usr/bin/certbot renew --quiet') | crontab - ;  
+    if test -z "$(crontab -l | grep  /usr/bin/certbot )"; then
+        echo $(crontab -l ; echo '0 2 * * * /usr/bin/certbot renew --quiet') | crontab - ;
     else
         echo "cerbot has been added to cron";
     fi
@@ -99,14 +99,14 @@ indexpage() {
 	<p>A new page ... </p>
 </body>
 </html>
-EOF 
+EOF
 }
 
 addconf() {
     SP=$1; shift;
-    NAME=$1; shift;
+    NAME=$1; shift
 
-    cat <<EOF > /etc/nginx/sites-available/$NAME.conf
+    cat <<EOF > /etc/nginx/sites-available/$NAME
 server {
 	listen 80;
 	listen [::]:80;
@@ -114,37 +114,38 @@ server {
 	root $SP;
 	index index.html index.htm;
 
-	server_name $@;
-	
+	server_name $Name $@;
+
 	location / {
 		try_files \$uri \$uri/ =404;
 	}
 }
-EOF
+EOF 
+
     test -L /etc/nginx/sites-enabled/$NAME || ln -s /etc/nginx/sites-available/$NAME /etc/nginx/sites-enabled/;
 }
 
 
 addconfcert() {
     SP=$1; shift;
-    
-    if test -e $1.key.pem; then 
+
+    if test -e $1.key.pem; then
         KEY=$1.key.pem
     else
         die "key: $1.key.pem not found"
     fi
 
-    if test -e $1.ca-chain.cert.pem; then 
+    if test -e $1.ca-chain.cert.pem; then
         CERT=$1.ca-chain.cert.pem
     elif test -e $1.cert.pem; then
         CERT=$1.cert.pem
-    else 
+    else
         die "certificate: $1.cert.pem not found"
     fi
     shift;
     NAME=$1; shift;
 
-    cat <<EOF > /etc/nginx/sites-available/$NAME.conf
+    cat <<EOF > /etc/nginx/sites-available/$NAME
 server {
 	listen 443 ssl;
 
@@ -155,19 +156,20 @@ server {
 
 	index index.html index.htm;
 
-	server_name $@;
-	
+	server_name $NAME $@;
+
 	location / {
 		try_files \$uri \$uri/ =404;
 	}
 }
 EOF
+
     test -L /etc/nginx/sites-enabled/$NAME || ln -s /etc/nginx/sites-available/$NAME /etc/nginx/sites-enabled/;
 }
 
 
-# 
-MODE=$1; 
+#
+MODE=$1;
 
 # mode switch
 case "$MODE" in

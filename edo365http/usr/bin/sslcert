@@ -77,8 +77,9 @@ test -e $CPATH/$NAME/$NAME.cert.pem || { \
       -in $CPATH/$NAME/$NAME.csr.pem \
       -out $CPATH/$NAME/$NAME.cert.pem; \
 	chmod 444 $CPATH/$NAME/$NAME.cert.pem; \
-	cp  $RPATH/root/$ROOT.cert.pem $CPATH/$NAME/$NAME.ca-chain.cert.pem; \
+	cp  $RPATH/root/$ROOT.cert.pem  $CPATH/$NAME/$NAME.ca-chain.cert.pem; \
 	openssl x509 -noout -text \
       -in $CPATH/$NAME/$NAME.cert.pem;
+	cat $CPATH/$NAME/$NAME.cert.pem $RPATH/root/$ROOT.cert.pem > $CPATH/$NAME/$NAME.ca-chain.cert.pem; \
 	openssl verify -CAfile $RPATH/$ROOT/$ROOT.cert.pem \
       $CPATH/$NAME/$NAME.cert.pem; }
