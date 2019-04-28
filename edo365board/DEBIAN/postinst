@@ -93,7 +93,7 @@ mkdir -p /samba/$USER/public
 mkdir -p /samba/$USER/style
 chown :sambashare /samba/;
 useradd --home /samba/$USER  --shell /usr/sbin/nologin --user-group  --groups sambashare $USER  || true;
-echo $USER:$PASSWD | chpasswd;
+#echo $USER:$PASSWD | chpasswd;
 chown -R $USER:sambashare /samba/$USER;
 chmod -R 2755 /samba/$USER/
 smbpasswd -a $USER;
