@@ -59,7 +59,7 @@ fi
 # ssl certificate
 if test ! -e "/etc/ssl/$SERVERNAME/$SERVERNAME.cert.pem"; then
     sslcert --root root --cert $SERVERNAME --path /etc/ssl
-    openssl x509 -in "/etc/ssl/$SERVERNAME/$SERVERNAME.cert.pem"-inform PEM -out "/usr/share/ca-certificates/$SERVERNAME.crt"
+    openssl x509 -in "/etc/ssl/$SERVERNAME/$SERVERNAME.cert.pem" -inform PEM -out "/usr/share/ca-certificates/$SERVERNAME.crt"
     update-ca-certificates
 fi
 
