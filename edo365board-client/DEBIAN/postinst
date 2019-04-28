@@ -57,7 +57,7 @@ chown -R $USER:$USER $UHOME/.xinitrc;
 chmod 644 $UHOME/.xinitrc;
 
 # Enable autologin
-if test ! -L cat /etc/systemd/system/getty.target.wants/getty@tty1.service; then
+if test ! -L /etc/systemd/system/getty.target.wants/getty@tty1.service; then
 cat /etc/systemd/system/getty.target.wants/getty@tty1.service | sed -e "s!*ExecStart=*!ExecStart=-/sbin/agetty -a $USER %I \$TERM!g" > /etc/systemd/system/getty.target.wants/getty@tty1_autologin.service;
 cat /etc/systemd/system/getty.target.wants/getty@tty1.service > /etc/systemd/system/getty.target.wants/getty@tty1.service.old
 rm -f /etc/systemd/system/getty.target.wants/getty@tty1.service 
