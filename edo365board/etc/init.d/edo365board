@@ -11,32 +11,34 @@
 
 
 # include functions
-. /etc/init.d/functions
+#. /etc/init.d/functions
+
+set -e
 
 # read config
 if test -e "/etc/edo365board.conf"; then 
-    while read -r SERVERNAME USER; 
-        do C_EXIST=true; 
+    while read -r SERVERNAME USER; do 
+        SERVERNAME=$A
+        USER=$B
     done < "/etc/edo365board.conf"
 else 
-
+      echo "edo365board missing config"
+      exit 1
+fi
 
 start() {
-        initlog -c "echo -n Starting edo365board watcher: "
+        echo -n "Starting edo365board watcher: "
         /usr/bin/edo365watchfolder --target /var/www/$SERVERNAME/listing.json --watch /samba/$USER/public/ &
         ### Create the lock file ###
         touch /var/lock/subsys/edo365board
-        success $"edo365board startup"
-        echo
 }
 
 # Restart the service 
 stop() {
-        initlog -c "echo -n Stopping edo365board watcher: "
+        echo -n "Stopping edo365board watcher: "
         killproc edo365watchfolder
         ### Now, delete the lock file ###
         rm -f /var/lock/subsys/edo365board
-        echo
 }
 
 
@@ -50,7 +52,8 @@ case "$1" in
         stop
         ;;
   status)
-        status_of_proc -p $PID "$DAEMON" "$NAME" && exit 0 || exit $?
+        #ostatus_of_proc -p $PID "$DAEMON" "$NAME" && exit 0 || exit $?
+        echo "missing"
         ;;
   restart|reload|condrestart)
         stop
